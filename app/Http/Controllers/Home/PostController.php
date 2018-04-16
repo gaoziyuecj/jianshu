@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Home;
 
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Model\Post;
 use Log;
+use Auth;
 
 class PostController extends Controller
 {
@@ -15,8 +17,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::orderby('created_at', 'desc')->paginate(5);
-        Log::info('post_index', ['data' => 'this is post index']);
+        $posts = Post::orderby('created_at', 'desc')->with('user')->paginate(5);
         return view('Home.article.index', compact('posts'));
     }
 
@@ -44,14 +45,18 @@ class PostController extends Controller
      */
     public function posts()
     {
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
         //验证
-        $this->validate(request(),[
+        $this->validate(request(), [
            'title' => 'required|string|max:100|min:5',
             'content' => 'required|string|min:10'
-        ],[
+        ], [
             'title.min' => '文章标题过短'
         ]);
         $param = request(['title','content']);
+        $param['user_id'] = Auth::id();
         Post::create($param);
         return redirect('/posts');
     }
@@ -66,25 +71,31 @@ class PostController extends Controller
     }
     public function update(Post $post)
     {
-        //TODO::用户权限验证
-
+        //用户权限验证
+        if (!Auth::user()->can('update', $post)) {
+            abort(403);
+        }
 
         //验证
-        $this->validate(request(),[
+        $this->validate(request(), [
             'title' => 'required|string|max:100|min:5',
             'content' => 'required|string|min:10'
-        ],[
+        ], [
             'title.min' => '文章标题过短'
         ]);
         $post->title = request('title');
         $post->content = request('content');
+        $post->user_id = Auth::id();
         $post->save();
         return redirect('/posts/'.$post->id);
     }
     public function delete($id)
     {
-        //TODO::用户权限验证
-
+        //用户权限验证
+        $post = Post::find($id);
+        if (!Auth::user()->can('delete', $post)) {
+            abort(403);
+        }
         Post::destroy($id);
         return redirect('/posts');
     }

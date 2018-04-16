@@ -20,15 +20,22 @@
 
         <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
-                <div>
-                    <img src="" alt="" class="img-rounded" style="border-radius:500px; height: 30px">
-                    <a href="#" class="blog-nav-item dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Kassandra Ankunding2  <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="/user/5">我的主页</a></li>
-                        <li><a href="/user/5/setting">个人设置</a></li>
-                        <li><a href="/logout">登出</a></li>
-                    </ul>
-                </div>
+                @if(Auth::check())
+                    <div>
+                        <img src="" alt="" class="img-rounded" style="border-radius:500px; height: 30px">
+                        <a href="#" class="blog-nav-item dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> {{ Auth::user()->name }}  <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/user/5">我的主页</a></li>
+                            <li><a href="/user/5/setting">个人设置</a></li>
+                            <li><a href="/logout">登出</a></li>
+                        </ul>
+                    </div>
+                @else
+                    <div>
+                        <a class="blog-nav-item" href="/login">登陆</a>
+                        <a class="blog-nav-item" href="/register">注册</a>
+                    </div>
+                @endif
             </li>
         </ul>
     </div>

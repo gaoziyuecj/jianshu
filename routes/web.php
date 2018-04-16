@@ -11,13 +11,29 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-Route::get('/index', 'Home\PostController@index');
+Route::get('/', 'Home\PostController@index');
 
 //==========前端路由管理================
 Route::namespace('Home')->group(function () {
+    //----用户模块-----
+    Route::name('users.')->group(function () {
+        //注册页面
+        Route::get('/register', 'RegisterController@index');
+        //保存注册信息
+        Route::post('/register', 'RegisterController@register');
+        //登陆页面
+        Route::get('/login', 'LoginController@index');
+        //保存登陆信息
+        Route::post('/login', 'LoginController@login');
+        //退出登陆
+        Route::get('/logout', 'LoginController@logout');
+        //个人设置页
+        Route::get('/user', 'UserController@setting');
+        //保存个人信息
+        Route::post('/user/me/setting', 'UserController@settingStore');
+
+    });
+
     //----文章模块----
     Route::name('post.')->group(function () {
         //文章列表页Ø
